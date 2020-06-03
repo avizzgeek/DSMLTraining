@@ -1,76 +1,62 @@
 import numpy as np
 import sympy as sy
-import math
+from math import *
 from random import randint,uniform
 
 
 def grad_diff(expression):
     expression = expression.split("=")
     print(expression)
-
+    rhs = expression[1]
+    #create symbols
     x, y = sy.symbols('x y')
 
-    lhs=expression[0]
-    rhs = expression[1]
-    grad1 = sy.diff(lhs, x)
-    grad2 = sy.diff(lhs, y)
-    print(grad1, grad2)
+    grad1 = sy.diff(rhs, x)
+    grad2 = sy.diff(rhs, y)
+
     flag = True
-    grad1Val = grad1.subs(x, 0)
-    grad2Val = grad2.subs(y, 0)
     gradValList = []
-    i = randint(0, 10)
-    j = randint(0, 10)
+    i = randint(1, 10)
+    j = randint(1, 10)
     newgradval1 = grad1.subs(x, i)
     newgradval2 = grad2.subs(y, j)
-    positivegradValList = []
-    negativegradValList =[]
-    while(flag):
+    gradValList.append(newgradval1)
+    gradValList.append(newgradval2)
+    unitVector = []
+    icap = i / sqrt(i ** 2 + j ** 2)
+    jcap = j / sqrt(i ** 2 + j ** 2)
+    unitVector.append(icap)
+    unitVector.append(jcap)
+    initialDirDerivative = newgradval1*icap + newgradval2 * jcap
 
-        if newgradval1 !=0:
-            i = randint(0, 10)
-            newgradval1 = grad1.subs(x, i)
-        if newgradval2 !=0:
-            j = randint(0, 10)
-            newgradval2 = grad2.subs(y,j)
-
-        if (newgradval1 - grad1Val) > 0 or (newgradval2 - grad2Val) > 0:
-            #moving towards minima
-            positivegradValList = [newgradval1,newgradval2]
-            grad1Val = newgradval1
-            grad2Val = newgradval2
-        elif (newgradval1 - grad1Val) < 0 or (newgradval2 - grad2Val) < 0:
-            #moving towars maxima.
-            negativegradValList = [newgradval1,newgradval2]
-            #if we are here then we are moving away from saddle point., so lets stop loop here.
-            flag = False
-
-    print(positivegradValList)
-    print(negativegradValList)
-
-
-    #now we have two points with +ve and -ve transition.
-    #we need to find the saddle point which lies in between the positivegradlist and negativegradlist points.
-    #i range 7/2 --> 2
-    #j range -2-->-7/3.
-    iStartCond = int(positivegradValList[0])
-    iStopCond = int(negativegradValList[0])
-    jStartCond = int(positivegradValList[0])
-    jStopCond = int(negativegradValList[0])
-    while(True):
-        i = uniform(iStartCond, iStopCond)
-        j = uniform(jStartCond, jStopCond)
-        #print("{0},{1}".format(newgradval1,newgradval2))
+    while (flag):
+        #Find Directional derivative.
+        i = randint(1, 10)
+        j = randint(1, 10)
         newgradval1 = grad1.subs(x, i)
         newgradval2 = grad2.subs(y, j)
+        print("Grad value 1:{0} 2:{1}".format(newgradval1,newgradval2))
+        nextDirDerivative = 0
+        sqr = np.sqrt(i**2 + j**2)
+        print("SQUAREROOT:",sqr)
+        icap = i/sqr
+        jcap = j/sqr
+        unitVector.append(icap)
+        unitVector.append(jcap)
+        nextDirDerivative = newgradval1*icap + newgradval2 * jcap
+        #now multiply U vector with grad vector.
+        print("i:{0} j:{1}".format(i,j))
+        print("icap:{0} jcap{1}".format(icap,jcap))
+        print("i:{0} j:{1}".format(i, j))
+        if (nextDirDerivative - initialDirDerivative) > 0:
+            if(newgradval1 == 0 or newgradval2 ==0):
+                #stop the loop we found the saddle point.
+                print("Saddle point is found at ({0},{1})".format(i,j))
+                break
+            initialDirDerivative = nextDirDerivative
+        else:
+            continue
 
-        newgradval1 = int(newgradval1)
-        newgradval2 = int(newgradval2)
-        print("{0},{1}".format(newgradval1,newgradval2))
-        if newgradval1 == 0 and newgradval2 == 0:
-            #we found the saddle point.
-            print("Saddle point of {0} is at ({1},{2})".format(expression,i,j))
-            break
 
 if __name__ == "__main__":
     expression = "x**2/4-y**2/6=z/8"
