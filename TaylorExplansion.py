@@ -38,21 +38,6 @@ def find_taylor_Expansion(expr,xvalue,avalue):
 
 def driverCode(expr):
     #substitue different values of x
-    '''for i in np.arange(-1,6,0.5):
-        Yarray.append(find_value_of_equation(expr,i))
-        Xarray.append(i)
-        if (i >= -1 and i < 1):
-            TYarray.append(find_taylor_Expansion(expr, i, 0))
-        elif (i >= 1 and i < 2):
-            TYarray.append(find_taylor_Expansion(expr, i, 1))
-        elif (i >= 2 and i < 3):
-            TYarray.append(find_taylor_Expansion(expr, i, 2))
-        elif (i >= 3 and i < 4):
-            TYarray.append(find_taylor_Expansion(expr, i, 3))
-        elif (i >= 4 and i < 5):
-            TYarray.append(find_taylor_Expansion(expr, i, 4))
-        elif (i >= 5 and i < 6):
-            TYarray.append(find_taylor_Expansion(expr, i, 5))'''
     for aval in np.arange(0,5,0.5):
         min = aval - 0.5
         max = aval + 0.5
