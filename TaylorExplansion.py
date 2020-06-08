@@ -10,13 +10,6 @@ Yarray = [ ]
 Xarray = [ ]
 
 TYarray = [ ]
-TXarray = [ ]
-def plot_graph(Yarray,Xarray,linecolor):
-    plt.plot(Xarray,Yarray,color=linecolor)
-    plt.ylabel('Nth order Derivative')
-    plt.xlabel('X Value')
-    plt.show()
-
 
 def find_value_of_equation(expr, value):
     substitutedValue = expr.subs(x, value)
