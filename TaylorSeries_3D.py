@@ -14,6 +14,24 @@ Xarray = [ ]
 TYarray = [ ]
 
 
+def getHassianMatrix(expr,xval,yval):
+    #since hessain matrix is found with doube partial derivative of the equation.
+    grad1 = sym.diff(expr, x)
+    grad2 = sym.diff(expr, y)
+    print("First Order partial derivative:F'x={0} F'y={1}".format(grad1,grad2))
+    grad2x = sym.diff(grad1,x)
+    grad2y = sym.diff(grad2,y)
+    grad2xy = sym.diff(grad1,y)
+    print("Second Order partial derivative:F''x={0} F''y={1} F''xy=F''yx={2}".format(grad2x,grad2y,grad2xy))
+    HassianList = [ ]
+    HassianList.append(grad2x.subs(x,xval).subs(y,yval))
+    HassianList.append(grad2xy.subs(y, yval).subs(x,xval))
+    HassianList.append(grad2xy.subs(y, yval).subs(x, xval))
+    HassianList.append(grad2y.subs(y,yval).subs(x,xval))
+
+    #conver the list to Hassian matrix and return the matrix.
+    HassianMatrix = np.reshape(HassianList, (2, 2))
+    return HassianMatrix
 
 def find_value_of_equation(expr, xval,yval):
     substitutedValue = expr.subs(x, xval)
@@ -79,7 +97,8 @@ def driverCode(expr):
     print("{0},{1},{2}".format(xvallist,yvallist,zvallist))
     # Data for three-dimensional scattered points
 
-
+    hassianMatrix = getHassianMatrix(expr,5,5)
+    print(hassianMatrix)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x, y, z = axes3d.get_test_data(0.05)
@@ -87,6 +106,7 @@ def driverCode(expr):
     plt.show()
 
 
+
 if __name__ == "__main__":
-    expr = x**5+y**5
+    expr = 5*x**2+x*y**3-y**2
     driverCode(expr)
