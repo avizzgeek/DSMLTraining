@@ -33,9 +33,19 @@ def getHassianMatrix(expr,xval,yval):
     HassianMatrix = np.reshape(HassianList, (2, 2))
     return HassianMatrix
 
+
+def getGradient(expr, xval, yval):
+    gradVector = []
+    x, y = sym.symbols('x y')
+    grad1 = sym.diff(expr, x)
+    grad2 = sym.diff(expr, y)
+    gradVector.append(grad1.subs(x, xval).subs(y,yval))
+    gradVector.append(grad2.subs(y, yval).subs(x,xval))
+    return gradVector
+
 def find_value_of_equation(expr, xval,yval):
-    substitutedValue = expr.subs(x, xval)
-    substitutedValue = substitutedValue.subs(y,yval)
+    substitutedValue = expr.subs(x, xval).subs(y,yval)
+    #substitutedValue = substitutedValue.subs(y,yval)
 
     return substitutedValue
 
@@ -63,48 +73,59 @@ def findDirDerivative(expression,xcod,ycod,zcod):
 
     return directionaDerivative
 
-def find_taylor_Expansion(expr,xvalue,avalue):
-    f0 = expr.subs(x, xvalue)
+def find_taylor_Expansion(expr,vVector,xvalue,yvalue):
+    #first term of solution F(a)
+    f0 = []
+    f0.append(expr.subs(x, xvalue).subs(y,yvalue))
     print(f0)
     sum = f0
-    for i in range(1,3):
-        equation = sym.diff(expr, x)
-        newterm = (equation.subs(x, xvalue)) / math.factorial(i)
-        xadiff = (xvalue-avalue)**i
-        newterm = newterm * xadiff
-        sum += newterm
-    return sum
 
+    #second term of solution
+    gradient = getGradient(expr,xvalue,yvalue)
+    term2 = np.dot(vVector, gradient)
+    sum  = np.add(sum,term2)
+
+    #third term of the solution.
+    HassianMatrix = getHassianMatrix(expr,xvalue,yvalue)
+    vVector = np.reshape(vVector,(2,1))
+    vVectorT = np.matrix.transpose(vVector)
+    term3 = np.dot(vVectorT, HassianMatrix)
+    term3 = np.dot(term3,vVector)
+    term3 = 1/2*term3
+    sum = np.add(sum,term3)
+    return sum
 
 def driverCode(expr):
     #substitue different values of x
     xvallist = []
     yvallist = []
     zvallist = []
-    for aval in np.arange(0,5,0.5):
-        min = aval - 0.5
-        max = aval + 0.5
-        i = 0
-        for xval in np.arange(min,max,0.1):
-            for yval in np.arange(min,max,0.1):
-                zval = find_value_of_equation(expr, xval,yval)
-                xvallist.append(int(xval))
-                yvallist.append(int(yval))
-                zvallist.append(int(zval))
+    for aval2 in np.arange(0,5,0.5):
+        for aval1 in np.arange(0,5,0.5):
+            min = aval1 - 0.5
+            max = aval1 + 0.5
+            #i = 0
+            for xval in np.arange(min,max,0.1):
+                yval = aval2
+                vVector = [ ]
+                vVector.append(xval-aval1)
+                vVector.append(yval-aval2)
+                zval = find_taylor_Expansion(expr,vVector,xval,yval)
+                xvallist.append(xval)
+                yvallist.append(yval)
+                zvallist.append(zval)
 
 
 
-    print("{0},{1},{2}".format(xvallist,yvallist,zvallist))
+    print("{0}".format(zvallist))
     # Data for three-dimensional scattered points
-
-    hassianMatrix = getHassianMatrix(expr,5,5)
-    print(hassianMatrix)
+    #plot 3-D graph
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x, y, z = axes3d.get_test_data(0.05)
     ax.plot_wireframe(x, y, z, rstride=5, cstride=5)
     plt.show()
-
+    
 
 
 if __name__ == "__main__":
